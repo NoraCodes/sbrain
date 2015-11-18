@@ -30,17 +30,18 @@ Decimal | Code  | Semantics
        1|      >|Increment `data_p`
        2|      -|Subtract one from the cell pointed at by `data_p`
        3|      +|Add one to the cell pointed at by `data_p`
-       5|      [|Set `jump_p` to the current position and, if the cell pointed at by `data_p` is zero, cease evaluating instructions until `inst_p` points at either a 6 (`]`), in which case begin evaluating there, or a 
-       6|      ]|Set `inst_p` to `jump_p` if the cell pointed at by `data_p` is nonzero.
-       7|      .|Place the value in the cell pointed at by `data_p` on the output tape
-       8|      ,|Place the next value from the input tape in the cell pointed at by `data_p`
-       9|      {|Push the value from the cell pointed at by `data_p` onto the stack
-      10|      }|Pop the next value from the stack into the cell pointed at by `data_p`
-      11|      (|Set `auxi_r` to the value of the cell pointed at by `data_p`
-      12|      )|Set the cell pointed at by `data_p` to the value in `auxi_r`
-      13|      z|Set the value in `auxi_r` to 0
-      14|      !|Perform a bitwise NOT on the value in `auxi_r`.
-      15|      s|Perform a bitshift to the left on the value in `auxi_r`. Bits shifted off the left are lost, and bits shifted in from the right are always zero.
+       4|      [|Set `jump_p` to the current position and, if the cell pointed at by `data_p` is zero, cease evaluating instructions until `inst_p` points at either a 6 (`]`), in which case begin evaluating there, or a 
+       5|      ]|Set `inst_p` to `jump_p` if the cell pointed at by `data_p` is nonzero.
+       6|      .|Place the value in the cell pointed at by `data_p` on the output tape
+       7|      ,|Place the next value from the input tape in the cell pointed at by `data_p`
+       8|      {|Push the value from the cell pointed at by `data_p` onto the stack
+       9|      }|Pop the next value from the stack into the cell pointed at by `data_p`
+      10|      (|Set `auxi_r` to the value of the cell pointed at by `data_p`
+      11|      )|Set the cell pointed at by `data_p` to the value in `auxi_r`
+      12|      z|Set the value in `auxi_r` to 0
+      13|      !|Perform a bitwise NOT on the value in `auxi_r`.
+      14|      s|Perform a bitshift to the left on the value in `auxi_r`. Bits shifted off the left are lost, and bits shifted in from the right are always zero.
+      14|      S|Perform a bitshift to the right on the value in `auxi_r`. Bits shifted off the right are lost, and bits shifted in from the left are always zero.
       31|      @|End the program. The exit code is the value in `auxi_r`. If repeated twice (@@) in the source code, the transliterator will consider all further source code to be data and will use it to initialize the data tape.
 
 The following instructions are seperated because they all follow similar rules. Each one performs an operation on the value at the cell pointed to by `data_p` (`a`) and the value in `auxi_r`(`b`), in that order if the operation is not commutative, storing it in the cell pointed at by `data_p`. The creation of a value in a cell greater than the maximum value able to be held by that cell shall result in a wraparound (e.g. 0xFFFFFFFF + 0b11 = 0b11)
