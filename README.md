@@ -53,7 +53,7 @@ Decimal | Code  | Semantics
       18|      *| a XOR b (bitwise)
       19|      ^| a NOR b (bitwise)
       20|      $| a NAND b (bitwise)
-      21|      s| SUM of a and b
+      21|      a| ADD of a and b
       22|      d| DIFFERENCE of a and b
       23|      p| QUOTIENT of a and b (a divided by b)
       24|      m| a MODULO b
