@@ -12,7 +12,7 @@ A library for execution of Semantic Brain, based on Urban Müller's famous but u
 * a read/write stack (FILO) datastructure which must support, at minimum, 256 values. Not all of these must be active in memory; however, SBrain programs may assume that they are addressable. They must be initially set to zero.
 * a read-only tape datastructure which contains the executable code. This code is represented as a list of unsigned integers of, at minimum, six bits in width.
 * a read-only nonreversable tape containing the program's input (note: as this tape is nonreversable and nonwriteable, a function like C's getch() works fine.)
-* a write-only nonreversable tape containing the program's output (note: as this tape is nonreversable and nonwriteable, a function like C's putch() works fine.)
+* a write-only nonreversable tape containing the program's output (note: as this tape is nonreversable and nonreadable, a function like C's putch() works fine.)
 * a read/write register (`data_p`) of enough bits to store a position on the data tape
 * a read/write register (`inst_p`) of enough bits to store a position on the instruction tape
 * a read/write register (`jump_p`) of enough bits to store a position on the instruction tape
@@ -30,7 +30,7 @@ Decimal | Code  | Semantics
        1|      >|Increment `data_p`
        2|      -|Subtract one from the cell pointed at by `data_p`
        3|      +|Add one to the cell pointed at by `data_p`
-       4|      [|Set `jump_p` to the current position and, if the cell pointed at by `data_p` is zero, cease evaluating instructions until `inst_p` points at a 6 (`]`).
+       4|      [|Set `jump_p` to the current position and, if the cell pointed at by `data_p` is zero, cease evaluating instructions until `inst_p` points at a 5 (`]`).
        5|      ]|Set `inst_p` to `jump_p` if the cell pointed at by `data_p` is nonzero.
        6|      .|Place the value in the cell pointed at by `data_p` on the output tape
        7|      ,|Place the next value from the input tape in the cell pointed at by `data_p`
