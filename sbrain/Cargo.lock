@@ -1,0 +1,11 @@
+[root]
+name = "sbrain"
+version = "0.1.0"
+dependencies = [
+ "libsbrain 0.1.0",
+]
+
+[[package]]
+name = "libsbrain"
+version = "0.1.0"
+
