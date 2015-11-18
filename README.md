@@ -63,3 +63,4 @@ Decimal | Code  | Semantics
 #### Further Rules
 No read operation shall ever disrupt a cell on the data tape.
 Reading an EOF always produces a 0.
+Non-command characters in the instruction section of source code must be ignored.
