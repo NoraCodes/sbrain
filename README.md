@@ -8,8 +8,9 @@ A library for execution of Semantic Brain, based on Urban Müller's famous but u
 #### Data Structures
   SBrain requires:
   
-* a read/write tape datastructure which is addressable up to, at minimum, 65,535 (0x0 - 0xFFFF) 32-bit cells. Not all of these must be active in memory; however, SBrain programs may assume that they are all addressable. They must be initially set to zero unless set with an initialization instruction.
-* a read/write stack (FILO) datastructure which must support, at minimum, 256 values. Not all of these must be active in memory; however, SBrain programs may assume that they are addressable. They must be initially set to zero.
+* a read/write tape datastructure ("data tape") which is addressable up to, at minimum, 65,535 (0x0 - 0xFFFF) 32-bit cells. Not all of these must be active in memory; however, SBrain programs may assume that they are all addressable. They must be initially set to zero unless set with an initialization instruction.
+* a read/write stack (FILO) datastructure ("data stack") which must support, at minimum, 256 values. Not all of these must be active in memory; however, SBrain programs may assume that they are addressable. They must be initially set to zero.
+* a read/write stack (FILO) datastructure ("jump stack") which must support, at minimum, 256 values large enough to store an address on the data tape. 
 * a read-only tape datastructure which contains the executable code. This code is represented as a list of unsigned integers of, at minimum, six bits in width.
 * a read-only nonreversable tape containing the program's input (note: as this tape is nonreversable and nonwriteable, a function like C's getch() works fine.)
 * a write-only nonreversable tape containing the program's output (note: as this tape is nonreversable and nonreadable, a function like C's putch() works fine.)
@@ -30,8 +31,8 @@ Decimal | Code  | Semantics
        1|      >|Increment `data_p`
        2|      -|Subtract one from the cell pointed at by `data_p`
        3|      +|Add one to the cell pointed at by `data_p`
-       4|      [|Set `jump_p` to the current position and, if the cell pointed at by `data_p` is zero, cease evaluating instructions until `inst_p` points at a 5 (`]`).
-       5|      ]|Set `inst_p` to `jump_p` if the cell pointed at by `data_p` is nonzero.
+       4|      [|Set `jump_p` to the current position, push `jump_p` to the jump stack, and, if the cell pointed at by `data_p` is zero, cease evaluating instructions until `inst_p` points at a 5 (`]`).
+       5|      ]|Pop an address from the jump stack. Set `inst_p` to `jump_p` if the cell pointed at by `data_p` is nonzero.
        6|      .|Place the value in the cell pointed at by `data_p` on the output tape
        7|      ,|Place the next value from the input tape in the cell pointed at by `data_p`
        8|      {|Push the value from the cell pointed at by `data_p` onto the stack
