@@ -65,3 +65,6 @@ Decimal | Code  | Semantics
 No read operation shall ever disrupt a cell on the data tape.
 Reading an EOF always produces a 0.
 Non-command characters in the instruction section of source code must be ignored.
+
+#### Note on executable format
+The executable format mentioned here is designed in such as way as to make it easy for SBrain code to selfmodify if such a feature is desired. It is not required, merely recommended.
