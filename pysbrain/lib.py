@@ -21,7 +21,7 @@ class SBrainVirtualMachine:
 
         self.data_p, self.inst_p, self.jump_p, self.auxi_r = 0  # Register and pointers
 
-    def load_data_tape(self, data_tape):
+    def load_data_t(self, data_tape):
         """
         Load a data tape into the virtual machine
         :param data_tape: The tape to load; a list of ints.
@@ -31,7 +31,7 @@ class SBrainVirtualMachine:
         self._len_data_t = len(data_tape)
         self.data_p = 0
 
-    def load_executable_tape(self, exec_tape):
+    def load_executable_t(self, exec_tape):
         """
         Load an executable tape (a transcribed program) into the virtual machine
         :param exec_tape: The tape to load: a list of ints
@@ -81,4 +81,22 @@ class SBrainVirtualMachine:
             return self.data_s.pop()
         else:
             return 0
+
+    def push_jump_s(self):
+        """
+        Push the current instruction pointer onto the jump stack for later use by a ]
+        :return: None
+        """
+        self.jump_s.append(self.inst_p)
+        self._len_jump_s += 1
+
+    def pop_jump_s(self):
+        """
+        Pop a character from the jump stack and return it, or return the current instruction position plus 1
+        :return: Jump position
+        """
+        if self._len_jump_s > 0:
+            return self._len_jump_s.pop()
+        else:
+            return self.inst_p + 1
 
