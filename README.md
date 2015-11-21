@@ -41,8 +41,8 @@ Decimal | Code  | Semantics
       11|      )|Set the cell pointed at by `data_p` to the value in `auxi_r`
       12|      z|Set the value in `auxi_r` to 0
       13|      !|Perform a bitwise NOT on the value in `auxi_r`.
-      14|      s|Perform a bitshift to the left on the value in `auxi_r`. Bits shifted off the left are lost, and bits shifted in from the right are always zero.
-      15|      S|Perform a bitshift to the right on the value in `auxi_r`. Bits shifted off the right are lost, and bits shifted in from the left are always zero.
+      14|      s|Perform a bitshift to the left on the value in `auxi_r`. Bits shifted off the left are lost, and bits shifted in from the right are always zero. (E.g. 11111101 -> 11111010)
+      15|      S|Perform a bitshift to the right on the value in `auxi_r`. Bits shifted off the right are lost, and bits shifted in from the left are always zero. (E.g. 11111101 -> 01111101)
       31|      @|End the program. The exit code is the value in `auxi_r`. If repeated twice (@@) in the source code, the transliterator will consider all further source code to be data and will use it to initialize the data tape.
 
 The following instructions are separated because they all follow similar rules. Each one performs an operation on the value at the cell pointed to by `data_p` (`a`) and the value in `auxi_r`(`b`), in that order if the operation is not commutative, storing it in the cell pointed at by `data_p`. The creation of a value in a cell greater than the maximum value able to be held by that cell shall result in a wraparound (e.g. 0xFFFFFFFF + 0b11 = 0b11)
