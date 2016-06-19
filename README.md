@@ -8,7 +8,7 @@ A library for execution of Semantic Brain, based on Urban Müller's famous but u
 #### Data Structures
   SBrain requires:
   
-* a read/write tape datastructure ("data tape") which is addressable up to, at minimum, 65,535 (0x0 - 0xFFFF) 32-bit cells. Not all of these must be active in memory; however, SBrain programs may assume that they are all addressable. They must be initially set to zero unless set with an initialization instruction.
+* a read/write tape datastructure ("data tape") which is addressable up to, at minimum, 65,536 (0x0 - 0xFFFF) 32-bit cells. Not all of these must be active in memory; however, SBrain programs may assume that they are all addressable. They must be initially set to zero unless set with an initialization instruction.
 * a read/write stack (FILO) datastructure ("data stack") which must support, at minimum, 256 values. Not all of these must be active in memory; however, SBrain programs may assume that they are addressable. They must be initially set to zero.
 * a read/write stack (FILO) datastructure ("jump stack") which must support, at minimum, 256 values large enough to store an address on the data tape. 
 * a read-only tape datastructure which contains the executable code. This code is represented as a list of unsigned integers of, at minimum, six bits in width.
