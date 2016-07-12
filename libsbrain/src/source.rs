@@ -8,7 +8,7 @@ enum ParserState {
 }
 
 /// Given a character, turn it into a SBrainVM instruction
-fn char_to_instruction(character: char) -> Option<u8>{
+fn char_to_instruction(character: char) -> Option<u8> {
     match character {
         '<' => Some(0),
         '>' => Some(1),
@@ -37,7 +37,7 @@ fn char_to_instruction(character: char) -> Option<u8>{
         'm' => Some(24),
         'p' => Some(25),
         '@' => Some(31),
-        _ => None
+        _ => None,
     }
 }
 
@@ -53,44 +53,40 @@ pub fn source_to_tapes(source: &str) -> (Vec<u8>, Vec<u32>) {
     // Code is the default state.
     let mut state: ParserState = ParserState::Code;
 
-    for character in source.chars(){
+    for character in source.chars() {
         match state {
             ParserState::Code => {
                 if character == '#' {
                     state = ParserState::Comment;
-                }
-                else {
+                } else {
                     if character == '@' {
                         state = ParserState::ExpectingAt;
                     }
                     match char_to_instruction(character) {
-                        None => {},
-                        Some(n) => code.push(n)
+                        None => {}
+                        Some(n) => code.push(n),
                     };
                 }
-            },
+            }
             ParserState::Data => {
                 data.push(character as u32);
-            },
+            }
             ParserState::Comment => {
                 if character == '#' {
                     state = ParserState::Code;
                 }
-            },
+            }
             ParserState::ExpectingAt => {
                 if character == '@' {
                     state = ParserState::Data;
                 } else {
                     match char_to_instruction(character) {
-                        None => {},
-                        Some(n) => code.push(n)
+                        None => {}
+                        Some(n) => code.push(n),
                     };
                 }
-            },
+            }
         };
     }
     return (code, data);
 }
-    
-        
-

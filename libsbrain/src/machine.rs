@@ -9,7 +9,7 @@ pub struct SBrainVM {
     // Data containers
     /// The data tape contains the primary data on which the program will operate
     /// 16-bit addresses with a single dead address
-    data_tape: [u32; 65536], 
+    data_tape: [u32; 65536],
     /// The data stack allows the position-independent storage of data
     data_stack: Vec<u32>,
     /// Auxiliary register (auxi_r)
@@ -28,10 +28,10 @@ pub struct SBrainVM {
     inst_p: u16,
     /// Pointer to the next jump position
     jump_p: u16,
-    
+
     // I/O Tapes
     input_t: Vec<u32>,
-    output_t: Vec<u32>
+    output_t: Vec<u32>,
 }
 
 /// FlowAction allows the VM's execution engine to implement flow control
@@ -43,7 +43,7 @@ pub enum FlowAction {
     /// The flow controller should skip to the next 5 (`]`), or loop end instructon
     SkipLoop,
     /// The program is done.
-    Done
+    Done,
 }
 
 impl SBrainVM {
@@ -76,7 +76,7 @@ impl SBrainVM {
         if program.len() > 65536 {
             return Err(String::from("Provided program exceeds VM tape length."));
         }
-        
+
         // Target is a slice of the VMs executable tape of the same size as the program
         // This is required from clone_from_slice
         self.exec_tape[0..program.len()].clone_from_slice(program);
@@ -100,7 +100,7 @@ impl SBrainVM {
     fn get_input(&mut self) -> u32 {
         match self.input_t.pop() {
             Some(n) => n,
-            None => 0
+            None => 0,
         }
     }
 
@@ -113,95 +113,137 @@ impl SBrainVM {
         match instr {
             // wrapping_add() and wrapping_sub are used in order to never overflow the bounds
             // of unsigned int types
-            
+            //
             // Decr. and incr. for data_p
-            0 => { self.data_p.wrapping_sub(1); },
-            1 => { self.data_p.wrapping_add(1); },
+            0 => {
+                self.data_p.wrapping_sub(1);
+            }
+            1 => {
+                self.data_p.wrapping_add(1);
+            }
             // Decr. and incr. for *data_p
-            2 => { self.data_tape[self.data_p as usize].wrapping_sub(1); },
-            3 => { self.data_tape[self.data_p as usize].wrapping_add(1); },
+            2 => {
+                self.data_tape[self.data_p as usize].wrapping_sub(1);
+            }
+            3 => {
+                self.data_tape[self.data_p as usize].wrapping_add(1);
+            }
             // Jump instructions
-            4 => { self.jump_p = self.inst_p;
-                   self.jump_stack.push(self.jump_p);
-                   // If *data_p is 0, the flow controller needs to skip to the next 5
-                   if self.data_tape[self.data_p as usize] == 0 {
-                    return FlowAction::SkipLoop; 
-                   } 
-                 },
-            5 => { self.jump_p = match self.jump_stack.pop(){
-                                    Some(n) => n,
-                                    None => 0
-                                 };
-                   // If *data_p isn't 0, jump to the instruction just retrieved
-                   if self.data_tape[self.data_p as usize] != 0 {
-                       self.inst_p = self.jump_p;
-                   }
-                 },
+            4 => {
+                self.jump_p = self.inst_p;
+                self.jump_stack.push(self.jump_p);
+                // If *data_p is 0, the flow controller needs to skip to the next 5
+                if self.data_tape[self.data_p as usize] == 0 {
+                    return FlowAction::SkipLoop;
+                }
+            }
+            5 => {
+                self.jump_p = match self.jump_stack.pop() {
+                    Some(n) => n,
+                    None => 0,
+                };
+                // If *data_p isn't 0, jump to the instruction just retrieved
+                if self.data_tape[self.data_p as usize] != 0 {
+                    self.inst_p = self.jump_p;
+                }
+            }
             // I/O commands
-            6 => { 
+            6 => {
                 let temp = self.data_tape[self.data_p as usize];
-                self.put_output(temp); },
-            7 => { 
+                self.put_output(temp);
+            }
+            7 => {
                 let temp = self.get_input();
-                self.data_tape[self.data_p as usize] = temp; },
+                self.data_tape[self.data_p as usize] = temp;
+            }
             // Stack instructions
-            8 => { self.data_stack.push(
-                    self.data_tape[self.data_p as usize]); }
-            9 => { self.data_tape[self.data_p as usize] = match self.data_stack.pop() {
-                                                    Some(n) => n,
-                                                    None => 0,
-                                                 };
-                 },
+            8 => {
+                self.data_stack.push(self.data_tape[self.data_p as usize]);
+            }
+            9 => {
+                self.data_tape[self.data_p as usize] = match self.data_stack.pop() {
+                    Some(n) => n,
+                    None => 0,
+                };
+            }
             // Aux register instructions
-            10 => { self.auxi_r = self.data_tape[self.data_p as usize]; },
-            11 => { self.data_tape[self.data_p as usize] = self.auxi_r; },
-            12 => { self.auxi_r = 0; },
+            10 => {
+                self.auxi_r = self.data_tape[self.data_p as usize];
+            }
+            11 => {
+                self.data_tape[self.data_p as usize] = self.auxi_r;
+            }
+            12 => {
+                self.auxi_r = 0;
+            }
             // Bitwise auxi_r instructions
             //  NOT
-            13 => { self.auxi_r = !self.auxi_r},
+            13 => self.auxi_r = !self.auxi_r,
             //  Left Shift
-            14 => { self.auxi_r = self.auxi_r << 1; },
+            14 => {
+                self.auxi_r = self.auxi_r << 1;
+            }
             //  Right Shift
-            15 => { self.auxi_r = self.auxi_r >> 1; },
+            15 => {
+                self.auxi_r = self.auxi_r >> 1;
+            }
 
             // Aux/tape operations
             //  OR
-            16 => { self.data_tape[self.data_p as usize] =
-                    self.data_tape[self.data_p as usize] | self.auxi_r; },
+            16 => {
+                self.data_tape[self.data_p as usize] = self.data_tape[self.data_p as usize] |
+                                                       self.auxi_r;
+            }
             //  AND
-            17 => { self.data_tape[self.data_p as usize] =
-                    self.data_tape[self.data_p as usize] & self.auxi_r; },
+            17 => {
+                self.data_tape[self.data_p as usize] = self.data_tape[self.data_p as usize] &
+                                                       self.auxi_r;
+            }
             //  XOR
-            18 => { self.data_tape[self.data_p as usize] =
-                    self.data_tape[self.data_p as usize] ^ self.auxi_r; },
+            18 => {
+                self.data_tape[self.data_p as usize] = self.data_tape[self.data_p as usize] ^
+                                                       self.auxi_r;
+            }
             //  NOR
-            19 => { self.data_tape[self.data_p as usize] =
-                    !(self.data_tape[self.data_p as usize] | self.auxi_r); },
+            19 => {
+                self.data_tape[self.data_p as usize] = !(self.data_tape[self.data_p as usize] |
+                                                         self.auxi_r);
+            }
             //  NAND
-            20 => { self.data_tape[self.data_p as usize] =
-                    !(self.data_tape[self.data_p as usize] & self.auxi_r); },
+            20 => {
+                self.data_tape[self.data_p as usize] = !(self.data_tape[self.data_p as usize] &
+                                                         self.auxi_r);
+            }
             //  ADD
-            21 => { self.data_tape[self.data_p as usize] =
-                    self.data_tape[self.data_p as usize].wrapping_add(self.auxi_r); },
+            21 => {
+                self.data_tape[self.data_p as usize] = self.data_tape[self.data_p as usize]
+                    .wrapping_add(self.auxi_r);
+            }
             //  DIFFERENCE
-            22 => { self.data_tape[self.data_p as usize] =
-                    self.data_tape[self.data_p as usize].wrapping_sub(self.auxi_r); },
+            22 => {
+                self.data_tape[self.data_p as usize] = self.data_tape[self.data_p as usize]
+                    .wrapping_sub(self.auxi_r);
+            }
             //  QUOTIENT
-            23 => { self.data_tape[self.data_p as usize] =
-                    self.data_tape[self.data_p as usize].wrapping_div(self.auxi_r); },
+            23 => {
+                self.data_tape[self.data_p as usize] = self.data_tape[self.data_p as usize]
+                    .wrapping_div(self.auxi_r);
+            }
             //  MODULO
-            24 => { self.data_tape[self.data_p as usize] =
-                    self.data_tape[self.data_p as usize] % self.auxi_r; },
+            24 => {
+                self.data_tape[self.data_p as usize] = self.data_tape[self.data_p as usize] %
+                                                       self.auxi_r;
+            }
             //  PRODUCT
-            25 => { self.data_tape[self.data_p as usize] =
-                    self.data_tape[self.data_p as usize].wrapping_mul(self.auxi_r); },
-            31 => { return FlowAction::Done; },
-            _ => {},
+            25 => {
+                self.data_tape[self.data_p as usize] = self.data_tape[self.data_p as usize]
+                    .wrapping_mul(self.auxi_r);
+            }
+            31 => {
+                return FlowAction::Done;
+            }
+            _ => {}
         }
         return FlowAction::NoAction;
+    }
 }
-}
-
-
-
-
