@@ -1,5 +1,3 @@
-use machine::*;
-
 enum ParserState {
     Code,
     Data,
