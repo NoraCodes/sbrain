@@ -1,37 +1,43 @@
 //! SBrain VM data structure definitions
 
+/// The type of a data cell
+pub type MData = u32;
+/// The type of a pointer to a cell.
+pub type MAddr = u16;
+
 /// A virtual machine modelling the SBrain Turing machine.
 /// This machine implements the specification relatively strictly, providing exactly 2^16 (65536) data and
 /// instruction cells. Thus, all pointers are u16. All data is u32.
 /// The main deviation from the minimum specification is the jump stack, which is indefinitely
 /// expandable.
+
 pub struct SBrainVM {
     // Data containers
     /// The data tape contains the primary data on which the program will operate
     /// 16-bit addresses with a single dead address
-    data_tape: [u32; 65536],
+    data_tape: [MData; 65536],
     /// The data stack allows the position-independent storage of data
-    data_stack: Vec<u32>,
+    data_stack: Vec<MData>,
     /// Auxiliary register (auxi_r)
-    auxi_r: u32,
+    auxi_r: MData,
 
     // Machine Internals
     /// The jump stack contains addresses on the data tape; 16 bit values are all that are
     /// necessary.
-    jump_stack: Vec<u16>,
+    jump_stack: Vec<MAddr>,
     /// The instruction tape contains instructions. This VM uses the recommended 6-bit binary
     /// format, but Rust does not have a 6-bit datatype, so u8 is used instead
     exec_tape: [u8; 65536],
     /// Pointer to the current data cell
-    data_p: u16,
+    data_p: MAddr,
     /// Pointer to the current instruction
-    inst_p: u16,
+    inst_p: MAddr,
     /// Pointer to the next jump position
-    jump_p: u16,
+    jump_p: MAddr,
 
     // I/O Tapes
-    input_t: Vec<u32>,
-    output_t: Vec<u32>,
+    input_t: Vec<MData>,
+    output_t: Vec<MData>,
 }
 
 /// FlowAction allows the VM's execution engine to implement flow control
@@ -48,7 +54,7 @@ pub enum FlowAction {
 
 impl SBrainVM {
     /// Return a new SBrainVM, with no data in any tapes.
-    pub fn new(input_t: Vec<u32>) -> SBrainVM {
+    pub fn new(input_t: Vec<MData>) -> SBrainVM {
         SBrainVM {
             data_tape: [0; 65536],
             data_stack: vec![0; 256],
@@ -65,7 +71,7 @@ impl SBrainVM {
     }
 
     /// Return a new SBrainVM in a Box<>, with no data in any tapes.
-    pub fn boxed(input_t: Vec<u32>) -> Box<SBrainVM> {
+    pub fn boxed(input_t: Vec<MData>) -> Box<SBrainVM> {
         Box::new(SBrainVM::new(input_t))
     }
 
@@ -85,7 +91,7 @@ impl SBrainVM {
 
     /// Load a data tape: copy data from the given slice into the VM's data tape.
     /// On error, the Err(s) return will contain a message describing the error.
-    pub fn load_data(&mut self, data: &[u32]) -> Result<(), String> {
+    pub fn load_data(&mut self, data: &[MData]) -> Result<(), String> {
         // No data can be longer than the data tape
         if data.len() > 65536 {
             return Err(String::from("Provided data exceeds VM tape length."));
@@ -97,14 +103,14 @@ impl SBrainVM {
         return Ok(());
     }
 
-    fn get_input(&mut self) -> u32 {
+    fn get_input(&mut self) -> MData {
         match self.input_t.pop() {
             Some(n) => n,
             None => 0,
         }
     }
 
-    fn put_output(&mut self, output: u32) {
+    fn put_output(&mut self, output: MData) {
         self.output_t.push(output);
     }
 
