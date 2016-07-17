@@ -50,7 +50,10 @@ pub fn source_to_tapes(source: &str) -> (Vec<u8>, Vec<u32>) {
     let mut code: Vec<u8> = Vec::new();
     let mut data: Vec<u32> = Vec::new();
 
-    // Code is the default state.
+    // Parsing is implemented as an FSM. Code is the default state; comments produce nothing, while
+    // finding an @ leads to an intermediate state where the machine expects a second @. Finding
+    // one, it will switch to data tape transcription; not finding one, it will return to Code.
+
     let mut state: ParserState = ParserState::Code;
 
     for character in source.chars() {
