@@ -122,10 +122,10 @@ impl SBrainVM {
             //
             // Decr. and incr. for data_p
             0 => {
-                self.data_p.wrapping_sub(1);
+                self.data_p = self.data_p.wrapping_sub(1);
             }
             1 => {
-                self.data_p.wrapping_add(1);
+                self.data_p = self.data_p.wrapping_add(1);
             }
             // Decr. and incr. for *data_p
             2 => {
@@ -251,5 +251,58 @@ impl SBrainVM {
             _ => {}
         }
         return FlowAction::NoAction;
+    }
+
+    /// Return the address of the next occurence of a given instruction
+    fn find_next(&self, target_instr: u8) -> MAddr {
+        // Look only after inst_p
+        for (addr, instr) in (&self.exec_tape[self.inst_p as usize..]).iter().enumerate() {
+            // Once found, return
+            if *instr == target_instr {
+                return (addr - 1) as MAddr;
+            };
+        }
+        // If not found, return the end of the tape. This allows broken programs to exit early,
+        // typically.
+        return (&self.exec_tape.len() - 1) as MAddr;
+    }
+
+    /// Return a copy of the output data of the machine
+    pub fn get_output(&self) -> Vec<MData> {
+        return self.output_t.clone();
+    }
+
+
+    /// Run the machine, until completion (cycles = None) or for n cycles (cycles = Some(n)).
+    /// Return values are number of cycles run and why the machine stopped: false if due to a
+    /// program halt (instr 31), false if due to running out of cycles.
+    pub fn run(&mut self, cycles: Option<u32>) -> (u32, bool) {
+        let mut done_cycles = 0;
+
+        // The main execution loop
+        loop {
+            // Execute the current instruction.
+            let instruction = self.exec_tape[self.inst_p as usize].clone();
+            let action = self.do_instruction(instruction);
+
+            // Take the appropriate action based on action
+            match action {
+                // Advance the tape
+                FlowAction::NoAction => self.inst_p += 1,
+                // Quit
+                FlowAction::Done => return (done_cycles, true),
+                // Skip to the end of a loop
+                FlowAction::SkipLoop => {
+                    self.inst_p = self.find_next(5);
+                }
+            }
+            // Increment the cycle count
+            done_cycles += 1;
+            if let Some(n) = cycles {
+                if done_cycles >= n {
+                    return (done_cycles, false);
+                }
+            }
+        }
     }
 }
