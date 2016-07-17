@@ -129,10 +129,12 @@ impl SBrainVM {
             }
             // Decr. and incr. for *data_p
             2 => {
-                self.data_tape[self.data_p as usize].wrapping_sub(1);
+                self.data_tape[self.data_p as usize] = self.data_tape[self.data_p as usize]
+                    .wrapping_sub(1);
             }
             3 => {
-                self.data_tape[self.data_p as usize].wrapping_add(1);
+                self.data_tape[self.data_p as usize] = self.data_tape[self.data_p as usize]
+                    .wrapping_add(1);
             }
             // Jump instructions
             4 => {

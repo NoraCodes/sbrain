@@ -2,7 +2,6 @@ extern crate libsbrain;
 use libsbrain::{source, machine};
 
 fn compare_output(source: &str, expected_output: &str) {
-    let source = String::from(source);
     let (p, d) = source::source_to_tapes(&source);
     let mut machine = machine::SBrainVM::new(vec![]);
     machine.load_program(&p).unwrap();
@@ -21,6 +20,19 @@ fn compare_output(source: &str, expected_output: &str) {
     assert_eq!(expected, actual);
 }
 
+fn compare_vec_output(source: &str,
+                      data_tape: Vec<machine::MData>,
+                      expected_output: Vec<machine::MData>) {
+    let (p, _) = source::source_to_tapes(&source);
+    let mut machine = machine::SBrainVM::new(vec![]);
+    machine.load_program(&p).unwrap();
+    machine.load_data(&data_tape).unwrap();
+    machine.run(Some(1000));
+    let actual = machine.get_output();
+    println!("Output: {:?}", actual);
+    assert_eq!(expected_output, actual);
+}
+
 #[test]
 fn test_transliteration() {
     let source = String::from("[.>]
@@ -36,4 +48,9 @@ fn test_transliteration() {
 #[test]
 fn test_hello_world() {
     compare_output("[.>]@@Hello, World!", "Hello, World!");
+}
+
+#[test]
+fn test_cell_mod() {
+    compare_vec_output("+. >-.", vec![1, 1], vec![2, 0]);
 }
