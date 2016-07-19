@@ -54,3 +54,52 @@ fn test_hello_world() {
 fn test_cell_mod() {
     compare_vec_output("+. >-.", vec![1, 1], vec![2, 0]);
 }
+
+#[test]
+fn test_loop() {
+    // Count down from 5
+    compare_vec_output("[.-]", vec![5], vec![5, 4, 3, 2, 1]);
+}
+
+#[test]
+fn test_stack() {
+    // print, push, forward, pop, print
+    compare_vec_output(".{>}.", vec![1], vec![1, 1]);
+}
+
+#[test]
+fn test_aux() {
+    // Put a value in the aux regiser and modify the tape, then pop and check
+    // that it's the same
+    compare_vec_output(".(+.).", vec![0], vec![0, 1, 0]);
+}
+
+#[test]
+fn test_auxi_zero() {
+    // put a 1 on the tape. It gets turned into a 0.
+    compare_vec_output("(z).", vec![1], vec![0]);
+}
+
+#[test]
+fn test_auxi_arithmetic() {
+    compare_vec_output("(a. > (d. > (m. > (q. > (p.",
+                       vec![1, 1, 2, 4, 5],
+                       vec![2, 0, 0, 1, 25]);
+}
+
+#[test]
+fn test_auxi_bitwise_unary() {
+    // (!). tests bitwise NOT
+    // (s). tests bit shift left
+    // (S). tests bit shift right
+    compare_vec_output("(!). > (s). > (S).",
+                       vec![1024, 2, 2],
+                       vec![4294966271, 4, 1]);
+}
+
+#[test]
+fn test_auxi_bitwise_binary() {
+    compare_vec_output("(>|. > (>&. > (>*. > (>^.",
+                       vec![2, 1024, 2, 1024, 2, 1024, 2, 1024],
+                       vec![1026, 0, 1026, 4294966269]);
+}

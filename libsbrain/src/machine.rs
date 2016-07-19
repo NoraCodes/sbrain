@@ -201,6 +201,7 @@ impl SBrainVM {
             16 => {
                 self.data_tape[self.data_p as usize] = self.data_tape[self.data_p as usize] |
                                                        self.auxi_r;
+                println!("or: {:?}", self.data_tape[self.data_p as usize]);
             }
             //  AND
             17 => {
