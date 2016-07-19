@@ -1,4 +1,11 @@
 [package]
 name = "libsbrain"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["SilverWingedSeraph <lfstindall@gmail.com>"]
+
+description = "A library for evaluating Semantic Brain, a minimalistic multiparadigm programming language."
+keywords = ["esolang", "interpreter", "language"]
+
+repository = "https://github.com/SilverWingedSeraph/libsbrain"
+
+license = "GPL-2.0"
