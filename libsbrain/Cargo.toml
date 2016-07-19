@@ -1,6 +1,6 @@
 [package]
-name = "libsbrain"
-version = "0.2.0"
+name = "sbrain"
+version = "0.2.1"
 authors = ["SilverWingedSeraph <lfstindall@gmail.com>"]
 
 description = "A library for evaluating Semantic Brain, a minimalistic multiparadigm programming language."
