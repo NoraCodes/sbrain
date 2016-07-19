@@ -86,6 +86,11 @@ fn test_auxi_arithmetic() {
 }
 
 #[test]
+fn test_zero_division() {
+    compare_vec_output("(>q. > (>m. ", vec![0, 10, 0, 10], vec![0, 0]);
+}
+
+#[test]
 fn test_auxi_bitwise_unary() {
     // (!). tests bitwise NOT
     // (s). tests bit shift left

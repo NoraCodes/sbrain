@@ -250,13 +250,21 @@ impl SBrainVM {
             }
             //  QUOTIENT
             23 => {
-                self.data_tape[self.data_p as usize] = self.data_tape[self.data_p as usize]
-                    .wrapping_div(self.auxi_r);
+                if self.auxi_r == 0 {
+                    self.data_tape[self.data_p as usize] = 0;
+                } else {
+                    self.data_tape[self.data_p as usize] = self.data_tape[self.data_p as usize]
+                        .wrapping_div(self.auxi_r);
+                }
             }
             //  MODULO
             24 => {
-                self.data_tape[self.data_p as usize] = self.data_tape[self.data_p as usize] %
-                                                       self.auxi_r;
+                if self.auxi_r == 0 {
+                    self.data_tape[self.data_p as usize] = 0;
+                } else {
+                    self.data_tape[self.data_p as usize] = self.data_tape[self.data_p as usize] %
+                                                           self.auxi_r;
+                }
             }
             //  PRODUCT
             25 => {
