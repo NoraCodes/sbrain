@@ -106,14 +106,14 @@ impl SBrainVM {
     }
 
     fn get_input(&mut self) -> MData {
-        match self.input_t {
-            Some(v) => {
+        match &mut self.input_t {
+            &mut Some(ref mut v) => {
                 match v.pop() {
                     Some(n) => n,
                     None => 0,
                 }
             }
-            None => {
+            &mut None => {
                 // No tape; get a byte from stdin
                 io::stdin()
                     .bytes()

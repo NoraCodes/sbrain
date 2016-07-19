@@ -3,7 +3,7 @@ use libsbrain::{source, machine};
 
 fn compare_output(source: &str, expected_output: &str) {
     let (p, d) = source::source_to_tapes(&source);
-    let mut machine = machine::SBrainVM::new(vec![]);
+    let mut machine = machine::SBrainVM::new(Some(vec![]));
     machine.load_program(&p).unwrap();
     machine.load_data(&d).unwrap();
     machine.run(Some(1000));
@@ -24,7 +24,7 @@ fn compare_vec_output(source: &str,
                       data_tape: Vec<machine::MData>,
                       expected_output: Vec<machine::MData>) {
     let (p, _) = source::source_to_tapes(&source);
-    let mut machine = machine::SBrainVM::new(vec![]);
+    let mut machine = machine::SBrainVM::new(Some(vec![]));
     machine.load_program(&p).unwrap();
     machine.load_data(&data_tape).unwrap();
     machine.run(Some(1000));
