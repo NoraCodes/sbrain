@@ -84,8 +84,41 @@ pub fn evaluate(source: &str, limit: Option<u32>) -> EvalResult {
         cycles: cycles,
         halted: halted,
     }
+}
+
+/// Functions much like `evaluate()`, but provides the VM with a fixed input tape.
+///
+/// ```
+/// # use sbrain::*;
+/// let result = fixed_evaluate(",.,.,.,.,.@", Some(vec![72, 101, 108, 108, 111]), None);
+///
+/// assert_eq!("Hello", &tape_to_string(result.output));
+/// ```
+pub fn fixed_evaluate(source: &str, input: Option<Vec<MData>>, limit: Option<u32>) -> EvalResult {
+    // Transliterate the source code, creating Vec<MData> tapes.
+    let (program, data) = source_to_tapes(&source);
+    // Create a machine
+    let mut machine: SBrainVM;
+    if let Some(v) = input {
+        machine = SBrainVM::new(Some(v.iter().rev().cloned().collect()));
+    } else {
+        machine = SBrainVM::new(None);
+    }
+    // Load the program and data tapes.
+    machine.load_program(&program).unwrap();
+    machine.load_data(&data).unwrap();
+
+    let (cycles, halted) = machine.run(limit);
+
+    EvalResult {
+        output: machine.get_output(),
+        cycles: cycles,
+        halted: halted,
+    }
 
 }
+
+
 
 /// Convert a tape of MData cells into Unicode chars. Invalid chars are excluded, which could have
 /// some unintended side effects for genesis based on string comparisons.
