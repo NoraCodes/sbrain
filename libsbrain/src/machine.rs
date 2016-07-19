@@ -1,4 +1,6 @@
 //! SBrain VM data structure definitions
+use std::io::Read;
+use std::io;
 
 /// The type of a data cell
 pub type MData = u32;
@@ -36,7 +38,7 @@ pub struct SBrainVM {
     jump_p: MAddr,
 
     // I/O Tapes
-    input_t: Vec<MData>,
+    input_t: Option<Vec<MData>>,
     output_t: Vec<MData>,
 }
 
@@ -54,7 +56,7 @@ pub enum FlowAction {
 
 impl SBrainVM {
     /// Return a new SBrainVM, with no data in any tapes.
-    pub fn new(input_t: Vec<MData>) -> SBrainVM {
+    pub fn new(input_t: Option<Vec<MData>>) -> SBrainVM {
         SBrainVM {
             data_tape: [0; 65536],
             data_stack: vec![0; 256],
@@ -71,7 +73,7 @@ impl SBrainVM {
     }
 
     /// Return a new SBrainVM in a Box<>, with no data in any tapes.
-    pub fn boxed(input_t: Vec<MData>) -> Box<SBrainVM> {
+    pub fn boxed(input_t: Option<Vec<MData>>) -> Box<SBrainVM> {
         Box::new(SBrainVM::new(input_t))
     }
 
@@ -104,9 +106,22 @@ impl SBrainVM {
     }
 
     fn get_input(&mut self) -> MData {
-        match self.input_t.pop() {
-            Some(n) => n,
-            None => 0,
+        match self.input_t {
+            Some(v) => {
+                match v.pop() {
+                    Some(n) => n,
+                    None => 0,
+                }
+            }
+            None => {
+                // No tape; get a byte from stdin
+                io::stdin()
+                    .bytes()
+                    .next()
+                    .and_then(|result| result.ok())
+                    .map(|byte| byte as u32)
+                    .unwrap_or(0)
+            }
         }
     }
 

@@ -99,6 +99,8 @@ fn test_auxi_bitwise_unary() {
 
 #[test]
 fn test_auxi_bitwise_binary() {
+    // Each of the four tests operates on 2 and 1024:
+    // load 2, advance to the cell containing 1024, operate, print, then move on to the next 2.
     compare_vec_output("(>|. > (>&. > (>*. > (>^.",
                        vec![2, 1024, 2, 1024, 2, 1024, 2, 1024],
                        vec![1026, 0, 1026, 4294966269]);
