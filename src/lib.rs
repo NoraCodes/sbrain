@@ -4,7 +4,22 @@
 //!
 //! This crate provides an implementation of the SBrain specification designed to be used for
 //! genetic programming. See the `specification` pseudomodule for the complete specification.
-
+//!
+//! Here's a quick example:
+//!
+//! ```
+//! # use sbrain::*;
+//! let result = evaluate("[.>]@@Test Data to Echo", None);
+//! assert_eq!("Test Data to Echo", &tape_to_string(result.output));
+//! // This program terminates after 52 cycles
+//! assert_eq!(52, result.cycles);
+//!
+//! // In this case, the program is interruped before completion.
+//! let result = evaluate("[.>]@@Test Data to Echo", Some(32));
+//! // The program doesn't finish, because it would take more than 32 cycles.
+//! assert_eq!("Test Data t", &tape_to_string(result.output));
+//! assert_eq!(false, result.halted);
+//! ```
 
 pub mod specification;
 mod machine;
@@ -30,6 +45,29 @@ pub struct EvalResult {
 /// # Panics
 /// This function panics if the source evaluates to tapes that exceed the maximum size of the
 /// VM's tapes (2^16 )
+///
+/// # Examples
+/// This simple program reads data off the tape until it encounters a 0. Here, `evaluate()` is used
+/// without an execution limit; this is because it's easy to reason about when the program will
+/// end. This isn't recommended for any but the simplest programs.
+///
+/// ```
+/// # use sbrain::*;
+/// let result = evaluate("[.>]@@Test Data to Echo", None);
+///
+/// assert_eq!("Test Data to Echo", &tape_to_string(result.output));
+/// // This program terminates after 52 cycles
+/// assert_eq!(52, result.cycles);
+/// ```
+/// In this case, the program is interruped before completion.
+///
+/// ```
+/// # use sbrain::*;
+/// let result = evaluate("[.>]@@Test Data to Echo", Some(32));
+/// // The program doesn't finish, because it would take more than 32 cycles.
+/// assert_eq!("Test Data t", &tape_to_string(result.output));
+/// assert_eq!(false, result.halted);
+/// ```
 pub fn evaluate(source: &str, limit: Option<u32>) -> EvalResult {
     // Transliterate the source code, creating Vec<MData> tapes.
     let (program, data) = source_to_tapes(&source);
@@ -47,4 +85,17 @@ pub fn evaluate(source: &str, limit: Option<u32>) -> EvalResult {
         halted: halted,
     }
 
+}
+
+/// Convert a tape of MData cells into Unicode chars. Invalid chars are excluded, which could have
+/// some unintended side effects for genesis based on string comparisons.
+pub fn tape_to_string(tape: Vec<MData>) -> String {
+    use std::char;
+    let mut result = String::with_capacity(tape.len());
+    for cell in tape {
+        if let Some(c) = char::from_u32(cell) {
+            result.push(c);
+        };
+    }
+    result
 }
