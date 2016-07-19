@@ -1,4 +1,4 @@
-//! SBrain VM data structure definitions
+//! The implementation of the SBrain VM.
 use std::io::Read;
 use std::io;
 
@@ -8,8 +8,8 @@ pub type MData = u32;
 pub type MAddr = u16;
 
 /// A virtual machine modelling the SBrain Turing machine.
-/// This machine implements the specification relatively strictly, providing exactly 2^16 (65536) data and
-/// instruction cells. Thus, all pointers are u16. All data is u32.
+/// This machine implements the specification relatively strictly, providing exactly 2^16 (65536)
+/// data and instruction cells. Thus, all pointers are 16 bits and all data is 32 bits.
 /// The main deviation from the minimum specification is the jump stack, which is indefinitely
 /// expandable.
 
@@ -42,13 +42,13 @@ pub struct SBrainVM {
     output_t: Vec<MData>,
 }
 
-/// FlowAction allows the VM's execution engine to implement flow control
+/// FlowAction allows the VM's execution engine to implement flow control.
 /// Because evaluation can only see a single instruction, it must use this struct to instruct the flow
 /// controller to perform flow control actions.
 pub enum FlowAction {
-    /// No flow control action is required
+    /// No flow control action is required.
     NoAction,
-    /// The flow controller should skip to the next 5 (`]`), or loop end instructon
+    /// The flow controller should skip to the next 5 (`]`), or loop end instructon.
     SkipLoop,
     /// The program is done.
     Done,
