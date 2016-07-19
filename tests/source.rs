@@ -1,9 +1,9 @@
-extern crate libsbrain;
-use libsbrain::{source, machine};
+extern crate sbrain;
+use sbrain::*;
 
 fn compare_output(source: &str, expected_output: &str) {
-    let (p, d) = source::source_to_tapes(&source);
-    let mut machine = machine::SBrainVM::new(Some(vec![]));
+    let (p, d) = source_to_tapes(&source);
+    let mut machine = SBrainVM::new(Some(vec![]));
     machine.load_program(&p).unwrap();
     machine.load_data(&d).unwrap();
     machine.run(Some(1000));
@@ -20,11 +20,9 @@ fn compare_output(source: &str, expected_output: &str) {
     assert_eq!(expected, actual);
 }
 
-fn compare_vec_output(source: &str,
-                      data_tape: Vec<machine::MData>,
-                      expected_output: Vec<machine::MData>) {
-    let (p, _) = source::source_to_tapes(&source);
-    let mut machine = machine::SBrainVM::new(Some(vec![]));
+fn compare_vec_output(source: &str, data_tape: Vec<MData>, expected_output: Vec<MData>) {
+    let (p, _) = source_to_tapes(&source);
+    let mut machine = SBrainVM::new(Some(vec![]));
     machine.load_program(&p).unwrap();
     machine.load_data(&data_tape).unwrap();
     machine.run(Some(1000));
@@ -39,7 +37,7 @@ fn test_transliteration() {
                               #comment#
                               #these two should not trigger a transition to data mode @@#
                               @@Hello, World!");
-    let tapes = source::source_to_tapes(&source);
+    let tapes = source_to_tapes(&source);
     assert_eq!(tapes,
                (vec![4, 6, 1, 5, 31],
                 vec![72, 101, 108, 108, 111, 44, 32, 87, 111, 114, 108, 100, 33]));

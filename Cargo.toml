@@ -6,6 +6,6 @@ authors = ["SilverWingedSeraph <lfstindall@gmail.com>"]
 description = "A library for evaluating Semantic Brain, a minimalistic multiparadigm programming language."
 keywords = ["esolang", "interpreter", "language"]
 
-repository = "https://github.com/SilverWingedSeraph/libsbrain"
+repository = "https://github.com/SilverWingedSeraph/sbrain"
 
 license = "GPL-2.0"

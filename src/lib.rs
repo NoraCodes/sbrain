@@ -1,12 +1,18 @@
+//! SBrain, or Semantic Brain, is a set of extensions to the famous language by Urban Müller
+//! designed to make it more amenable to genetic programming. Additions include a stack, a general-
+//! purpose register, and single-instruction arithmetic.
+//!
+//! This crate provides an implementation of the SBrain specification designed to be used for
+//! genetic programming. See the `specification` pseudomodule for the complete specification.
 
-#[allow(dead_code)]
+
 pub mod specification;
 mod machine;
-/// These datatypes are used to represent the data and address cells and registers in the machine.
-pub use machine::*;
-#[allow(dead_code)]
 mod source;
+
+pub use machine::*;
 pub use source::source_to_tapes;
+
 /// Represents the outcome of an evaluation by the SBrain VM.
 pub struct EvalResult {
     /// The output of the computation
