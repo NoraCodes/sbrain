@@ -45,7 +45,7 @@ pub struct SBrainVM {
 /// FlowAction allows the VM's execution engine to implement flow control.
 /// Because evaluation can only see a single instruction, it must use this struct to instruct the flow
 /// controller to perform flow control actions.
-pub enum FlowAction {
+enum FlowAction {
     /// No flow control action is required.
     NoAction,
     /// The flow controller should skip to the next 5 (`]`), or loop end instructon.
@@ -70,11 +70,6 @@ impl SBrainVM {
             input_t: input_t,
             output_t: Vec::new(),
         }
-    }
-
-    /// Return a new SBrainVM in a Box<>, with no data in any tapes.
-    pub fn boxed(input_t: Option<Vec<MData>>) -> Box<SBrainVM> {
-        Box::new(SBrainVM::new(input_t))
     }
 
     /// Load a program tape: copy data from the given slice into the executable tape.
@@ -276,20 +271,6 @@ impl SBrainVM {
             _ => {}
         }
         return FlowAction::NoAction;
-    }
-
-    /// Return the address of the next occurence of a given instruction
-    fn find_next(&self, target_instr: u8) -> MAddr {
-        // Look only after inst_p
-        for (addr, instr) in (&self.exec_tape[self.inst_p as usize..]).iter().enumerate() {
-            // Once found, return
-            if *instr == target_instr {
-                return (addr - 1) as MAddr;
-            };
-        }
-        // If not found, return the end of the tape. This allows broken programs to exit early,
-        // typically.
-        return (&self.exec_tape.len() - 1) as MAddr;
     }
 
     /// Return a copy of the output data of the machine
