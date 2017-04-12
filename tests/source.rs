@@ -1,6 +1,7 @@
 extern crate sbrain;
 use sbrain::*;
 
+
 fn compare_output(source: &str, expected_output: &str) {
     let (p, d) = source_to_tapes(&source);
     let mut machine = SBrainVM::new(Some(vec![]));
@@ -47,6 +48,13 @@ fn test_transliteration() {
 fn test_hello_world() {
     compare_output("[.>]@@Hello, World!", "Hello, World!");
 }
+
+#[test]
+fn test_badloop() {
+    compare_output("[", "");
+    compare_output("][", "");
+}
+
 
 #[test]
 fn test_cell_mod() {

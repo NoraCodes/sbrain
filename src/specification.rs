@@ -20,7 +20,7 @@
 //!
 //! SBrain source code consists of text characters. Executable code consists of unsigned integers of six bits. A transliterator converts the source code to executable code by a one-to-one mapping, with two exceptions. The first is noted in the entry for instruction 31 (@), which is a metacharacter in certain circumstances. The second is the comment character, #. All data between # characters, including those characters, is ignored by the transliterator.
 //!
-//! The first eight instructions are the standard brainf--- instructions. **Any brainf--- program is a valid SBrain program and should behave in the same way as in a standard, semantically equivalent brainf--- interpreter.**
+//! The first eight instructions are the standard brainf--- instructions. **Any brainf--- program is a valid SBrain program and should behave in the same way as in a standard, semantically equivalent brainf--- interpreter**, so long as comments are properly escaped.
 //!
 //! Decimal | Code  | Semantics
 //! --------|-------|----------
@@ -62,4 +62,7 @@
 //! No read operation shall ever disrupt a cell on the data tape.
 //! Reading an EOF always produces a 0.
 //! Non-command characters in the instruction section of source code must be ignored.
+//! 
+//! In the case of the instruction pointer running off the end of the tape, it must wrap to the
+//! beginning.
 //!

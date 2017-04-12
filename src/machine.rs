@@ -278,9 +278,20 @@ impl SBrainVM {
         return self.output_t.clone();
     }
 
+    fn nexti(&mut self) -> bool {
+        // increment the PC
+        self.inst_p  = self.inst_p.wrapping_add(1);
+        // if it went over, wrap it and inform the caller
+        if self.inst_p as usize == self.exec_tape.len() - 1{
+            self.inst_p = 0;
+            return true;
+        }
+        return false;
+    }
+
 
     /// Run the machine, until completion (cycles = None) or for n cycles (cycles = Some(n)).
-    /// Return values are number of cycles run and why the machine stopped: false if due to a
+    /// Return values are number of cycles run and why the machine stopped: true if due to a
     /// program halt (instr 31), false if due to running out of cycles.
     pub fn run(&mut self, cycles: Option<u32>) -> (u32, bool) {
         let mut done_cycles = 0;
@@ -294,14 +305,14 @@ impl SBrainVM {
             // Take the appropriate action based on action
             match action {
                 // Advance the tape
-                FlowAction::NoAction => self.inst_p += 1,
+                FlowAction::NoAction => {self.nexti();},
                 // Quit
                 FlowAction::Done => return (done_cycles, true),
                 // Skip to the end of a loop
                 FlowAction::SkipLoop => {
                     let mut count = 1;
                     while count > 0 {
-                        self.inst_p += 1;
+                        if self.nexti() { break; };
                         // On a [, increment the count
                         if self.exec_tape[self.inst_p as usize] == 4 { count += 1; }
                         // On a ], decrement the count
