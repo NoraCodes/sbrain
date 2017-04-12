@@ -17,7 +17,7 @@ fn compare_output(source: &str, expected_output: &str) {
         print!("{}", *c as u8 as char);
     }
     println!("");
-    assert_eq!(expected, actual);
+    assert_eq!(expected, actual, "Expected {:?}, but the machine output {:?}.", expected, actual);
 }
 
 fn compare_vec_output(source: &str, data_tape: Vec<MData>, expected_output: Vec<MData>) {
@@ -28,7 +28,7 @@ fn compare_vec_output(source: &str, data_tape: Vec<MData>, expected_output: Vec<
     machine.run(Some(1000));
     let actual = machine.get_output();
     println!("Output: {:?}", actual);
-    assert_eq!(expected_output, actual);
+    assert_eq!(expected_output, actual, "Expected {:?}, but the machine output {:?}.", expected_output, actual);
 }
 
 #[test]
@@ -51,6 +51,11 @@ fn test_hello_world() {
 #[test]
 fn test_cell_mod() {
     compare_vec_output("+. >-.", vec![1, 1], vec![2, 0]);
+}
+
+#[test]
+fn test_manual_division() {
+    compare_vec_output("[->+>-[>+>>]>[+[-<+>]>+>>]<<<<<<] >>>>.", vec![20, 0, 2], vec![10]);
 }
 
 #[test]

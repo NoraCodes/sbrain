@@ -318,7 +318,16 @@ impl SBrainVM {
                 FlowAction::Done => return (done_cycles, true),
                 // Skip to the end of a loop
                 FlowAction::SkipLoop => {
-                    self.inst_p = self.find_next(5);
+                    let mut count = 1;
+                    while count > 0 {
+                        self.inst_p += 1;
+                        // On a [, increment the count
+                        if self.exec_tape[self.inst_p as usize] == 4 { count += 1; }
+                        // On a ], decrement the count
+                        if self.exec_tape[self.inst_p as usize] == 5 {
+                            count -= 1; 
+                        }
+                    }
                 }
             }
             // Increment the cycle count

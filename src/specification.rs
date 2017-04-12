@@ -28,7 +28,7 @@
 //!        1|      >|Increment `data_p`
 //!        2|      -|Subtract one from the cell pointed at by `data_p`
 //!        3|      +|Add one to the cell pointed at by `data_p`
-//!        4|      [|Set `jump_p` to the current position, push `jump_p` to the jump stack, and, if the cell pointed at by `data_p` is zero, cease evaluating instructions until `inst_p` points at a 5 (`]`).
+//!        4|      [|Set `jump_p` to the current position, push `jump_p` to the jump stack, and, if the cell pointed at by `data_p` is zero, cease evaluating instructions until `inst_p` points at the corresponding 5 (`]`).
 //!        5|      ]|Pop an address from the jump stack into `jump_p`. If the jump stack is empty, set `jump_p` to the current `inst_p` + 1 instead (making this a NOP). Set `inst_p` to `jump_p` if the cell pointed at by `data_p` is nonzero.
 //!        6|      .|Place the value in the cell pointed at by `data_p` on the output tape
 //!        7|      ,|Place the next value from the input tape in the cell pointed at by `data_p`
