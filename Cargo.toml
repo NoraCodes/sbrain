@@ -1,11 +1,15 @@
 [package]
 name = "sbrain"
-version = "0.3.2"
+version = "0.4.1"
 authors = ["SilverWingedSeraph <lfstindall@gmail.com>"]
 
-description = "A library for evaluating Semantic Brain, a minimalistic multiparadigm programming language."
-keywords = ["esolang", "interpreter", "language"]
+description = "A library for evaluating Semantic Brain, a minimalistic multiparadigm programming language optimized for genetic programming applications."
+keywords = ["esolang", "interpreter", "language", "learning", "genetic"]
 
 repository = "https://github.com/SilverWingedSeraph/sbrain"
+homepage = "https://esolangs.org/wiki/Semantic_Brain"
+documentation = "https://docs.rs/sbrain"
+readme = "README.md"
+categories = ["emulators", "science"]
 
 license = "GPL-2.0"
