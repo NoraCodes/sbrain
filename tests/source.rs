@@ -1,123 +1,101 @@
 extern crate sbrain;
 use sbrain::*;
+use std::io::Cursor;
 
+fn compare_output(source: &str, expected: &[u8]) {
+    let program = source_to_tape(&source);
+    let mut output = sbrain::make_output_vec();
+    {
+        let mut machine = SBrainVM::new(None, Some(&mut output), &program);
 
-fn compare_output(source: &str, expected_output: &str) {
-    let (p, d) = source_to_tapes(&source);
-    let mut machine = SBrainVM::new(Some(vec![]));
-    machine.load_program(&p).unwrap();
-    machine.load_data(&d).unwrap();
-    machine.run(Some(1000));
-    let mut expected = Vec::with_capacity(expected_output.len());
-    for c in expected_output.chars() {
-        expected.push(c as u32);
+        machine.load_program(&program).unwrap();
+        machine.run(Some(1000)).expect("I/O failed");
     }
-    let actual = machine.get_output();
-    print!("Output: ");
-    for c in &actual {
-        print!("{}", *c as u8 as char);
-    }
-    println!("");
-    assert_eq!(expected, actual, "Expected {:?}, but the machine output {:?}.", expected, actual);
+
+    let actual = output.into_inner();
+    assert_eq!(expected, &actual[0..], "Expected {:?}, but the machine output {:?}.", expected, actual);
 }
 
-fn compare_vec_output(source: &str, data_tape: Vec<MData>, expected_output: Vec<MData>) {
-    let (p, _) = source_to_tapes(&source);
-    let mut machine = SBrainVM::new(Some(vec![]));
-    machine.load_program(&p).unwrap();
-    machine.load_data(&data_tape).unwrap();
-    machine.run(Some(1000));
-    let actual = machine.get_output();
-    println!("Output: {:?}", actual);
-    assert_eq!(expected_output, actual, "Expected {:?}, but the machine output {:?}.", expected_output, actual);
+fn compare_output_ext(source: &str, input: Vec<u8>, expected: &[u8]) {
+    let program = source_to_tape(&source);
+    let mut output = sbrain::make_output_vec();
+    let mut input = Box::new(Cursor::new(input));
+    {
+        let mut machine = SBrainVM::new(Some(&mut input), Some(&mut output), &program);
+
+        machine.load_program(&program).unwrap();
+        machine.run(Some(1000)).expect("I/O failed");
+    }
+
+    let actual = output.into_inner();
+    assert_eq!(expected, &actual[0..], "Expected {:?}, but the machine output {:?}.", expected, actual);
 }
 
 #[test]
 fn test_transliteration() {
-    let source = String::from("[.>]
-                              #comment#
-                              #these two should not trigger a transition to data mode @@#
-                              @@Hello, World!");
-    let tapes = source_to_tapes(&source);
-    assert_eq!(tapes,
-               (vec![4, 6, 1, 5, 31],
-                vec![72, 101, 108, 108, 111, 44, 32, 87, 111, 114, 108, 100, 33]));
+    let source = String::from("[.>]@
+                              #comment#");
+    let tape = source_to_tape(&source);
+    assert_eq!(tape, vec![4, 6, 1, 5, 15]);
 }
 
 #[test]
-fn test_hello_world() {
-    compare_output("[.>]@@Hello, World!", "Hello, World!");
+fn test_cat() {
+    compare_output_ext(",[.>,]", b"Hello, World!".to_vec(), b"Hello, World!");
 }
 
 #[test]
 fn test_badloop() {
-    compare_output("[", "");
-    compare_output("][", "");
+    compare_output("[", b"");
+    compare_output("][", b"");
 }
 
 
 #[test]
 fn test_cell_mod() {
-    compare_vec_output("+. >-.", vec![1, 1], vec![2, 0]);
+    compare_output_ext(",+. >-.", vec![1], &[2, 255]);
 }
 
 #[test]
 fn test_manual_division() {
-    compare_vec_output("[->+>-[>+>>]>[+[-<+>]>+>>]<<<<<<] >>>>.", vec![20, 0, 2], vec![10]);
+    compare_output_ext(",>,>,<<[->+>-[>+>>]>[+[-<+>]>+>>]<<<<<<] >>>>.", vec![20, 0, 2], &[10]);
 }
 
 #[test]
 fn test_loop() {
     // Count down from 5
-    compare_vec_output("[.-]", vec![5], vec![5, 4, 3, 2, 1]);
+    compare_output_ext(",[.-]", vec![5], &[5, 4, 3, 2, 1]);
 }
 
 #[test]
 fn test_stack() {
     // print, push, forward, pop, print
-    compare_vec_output(".{>}.", vec![1], vec![1, 1]);
+    compare_output_ext(",.{>}.", vec![1], &[1, 1]);
 }
 
 #[test]
 fn test_aux() {
     // Put a value in the aux regiser and modify the tape, then pop and check
     // that it's the same
-    compare_vec_output(".(+.).", vec![0], vec![0, 1, 0]);
+    compare_output_ext(",.(+.).", vec![0], &[0, 1, 0]);
 }
 
 #[test]
 fn test_auxi_zero() {
     // put a 1 on the tape. It gets turned into a 0.
-    compare_vec_output("(z).", vec![1], vec![0]);
-}
-
-#[test]
-fn test_auxi_arithmetic() {
-    compare_vec_output("(a. > (d. > (m. > (q. > (p.",
-                       vec![1, 1, 2, 4, 5],
-                       vec![2, 0, 0, 1, 25]);
-}
-
-#[test]
-fn test_zero_division() {
-    compare_vec_output("(>q. > (>m. ", vec![0, 10, 0, 10], vec![0, 0]);
+    compare_output_ext(",(^).", vec![1], &[0]);
 }
 
 #[test]
 fn test_auxi_bitwise_unary() {
     // (!). tests bitwise NOT
-    // (s). tests bit shift left
-    // (S). tests bit shift right
-    compare_vec_output("(!). > (s). > (S).",
-                       vec![1024, 2, 2],
-                       vec![4294966271, 4, 1]);
+    compare_output_ext(",(!).", vec![0], &[255]);
 }
 
 #[test]
 fn test_auxi_bitwise_binary() {
-    // Each of the four tests operates on 2 and 1024:
-    // load 2, advance to the cell containing 1024, operate, print, then move on to the next 2.
-    compare_vec_output("(>|. > (>&. > (>*. > (>^.",
-                       vec![2, 1024, 2, 1024, 2, 1024, 2, 1024],
-                       vec![1026, 0, 1026, 4294966269]);
+    // read, load register, read, operate, write to tape, write out
+    compare_output_ext(",(,&).",
+                       vec![2, 128],
+                       &[0]);
 }
