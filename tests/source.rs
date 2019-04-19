@@ -6,7 +6,8 @@ fn compare_output(source: &str, expected: &[u8]) {
     let program = source_to_tape(&source);
     let mut output = sbrain::make_output_vec();
     {
-        let mut machine = SBrainVM::new(None, Some(&mut output), &program);
+        let mut machine = SBrainVM::new(None, Some(&mut output), &program)
+            .expect("Could not build machine");
 
         machine.load_program(&program).unwrap();
         machine.run(Some(1000)).expect("I/O failed");
@@ -27,7 +28,8 @@ fn compare_output_ext(source: &str, input: Vec<u8>, expected: &[u8]) {
     let mut output = sbrain::make_output_vec();
     let mut input = Box::new(Cursor::new(input));
     {
-        let mut machine = SBrainVM::new(Some(&mut input), Some(&mut output), &program);
+        let mut machine = SBrainVM::new(Some(&mut input), Some(&mut output), &program)
+            .expect("Could not build machine");
 
         machine.load_program(&program).unwrap();
         machine.run(Some(1000)).expect("I/O failed");

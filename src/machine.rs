@@ -42,7 +42,7 @@ impl<'a> SBrainVM<'a> {
         input: Option<&'a mut dyn Read>,
         output: Option<&'a mut dyn Write>,
         program: &[u8],
-    ) -> SBrainVM<'a> {
+    ) -> Result<SBrainVM<'a>, String> {
         let mut new = SBrainVM {
             data_tape: [0; 65536],
             data_stack: vec![0; 256],
@@ -54,8 +54,8 @@ impl<'a> SBrainVM<'a> {
             input_t: input,
             output_t: output,
         };
-        new.load_program(program);
-        new
+        new.load_program(program)?;
+        Ok(new)
     }
 
     /// Load a program tape: copy data from the given slice into the executable tape,
@@ -154,7 +154,7 @@ impl<'a> SBrainVM<'a> {
             // I/O commands
             6 => {
                 let temp = self.data_tape[self.data_p as usize];
-                self.put_output(temp);
+                self.put_output(temp)?;
             }
             7 => {
                 let temp = self.get_input()?;
