@@ -14,19 +14,19 @@
 //! let mut output = make_output_vec();
 //! SBrainVM::new(Some(&mut input), Some(&mut output), &program)
 //!     .run(Some(1000)).expect("I/O failed");
-//! 
+//!
 //! let output = output.into_inner();
 //! assert_eq!(&output, b"Hello, world!")
 //! ```
 
-pub mod specification;
 mod machine;
 mod source;
+pub mod specification;
 mod tapes;
 
 pub use machine::*;
 pub use source::source_to_tape;
-pub use tapes::{make_output_vec, make_input_vec, tape_to_string};
+pub use tapes::{make_input_vec, make_output_vec, tape_to_string};
 
 use std::io;
 
@@ -36,7 +36,7 @@ pub type MData = u8;
 pub type MAddr = u16;
 
 /// Converts the given source code to a SBrain executable and runs it, taking input from stdin and doing output on stdout.
-/// 
+///
 /// # Panics
 /// Panics if there is an I/O error with standard in or standard out.
 pub fn simple_run(source: &str) -> u8 {

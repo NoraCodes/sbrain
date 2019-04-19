@@ -42,15 +42,15 @@
 //!       12|      ^| Set the value in `auxi_r` to 0
 //!       13|      !| Perform a bitwise NOT on the value in `auxi_r`.
 //!       14|      &| Perform a bitwise AND on the value in `auxi_r` and the cell pointed at `data_p`, placing the value in `auxi_r`.
-//!       15|      @| End the program. The exit code is the value in `auxi_r`. 
+//!       15|      @| End the program. The exit code is the value in `auxi_r`.
 //!
 //! ### Further Rules
 //! No read operation shall ever disrupt a cell on the data tape.
-//! 
+//!
 //! Reading an EOF always produces a 0.
-//! 
+//!
 //! Non-command characters in the instruction section of source code must be ignored.
-//! 
+//!
 //! In the case of the instruction pointer running off the end of the tape, it must wrap to the
 //! beginning.
 //!

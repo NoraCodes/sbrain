@@ -13,7 +13,13 @@ fn compare_output(source: &str, expected: &[u8]) {
     }
 
     let actual = output.into_inner();
-    assert_eq!(expected, &actual[0..], "Expected {:?}, but the machine output {:?}.", expected, actual);
+    assert_eq!(
+        expected,
+        &actual[0..],
+        "Expected {:?}, but the machine output {:?}.",
+        expected,
+        actual
+    );
 }
 
 fn compare_output_ext(source: &str, input: Vec<u8>, expected: &[u8]) {
@@ -28,13 +34,21 @@ fn compare_output_ext(source: &str, input: Vec<u8>, expected: &[u8]) {
     }
 
     let actual = output.into_inner();
-    assert_eq!(expected, &actual[0..], "Expected {:?}, but the machine output {:?}.", expected, actual);
+    assert_eq!(
+        expected,
+        &actual[0..],
+        "Expected {:?}, but the machine output {:?}.",
+        expected,
+        actual
+    );
 }
 
 #[test]
 fn test_transliteration() {
-    let source = String::from("[.>]@
-                              #comment#");
+    let source = String::from(
+        "[.>]@
+                              #comment#",
+    );
     let tape = source_to_tape(&source);
     assert_eq!(tape, vec![4, 6, 1, 5, 15]);
 }
@@ -50,7 +64,6 @@ fn test_badloop() {
     compare_output("][", b"");
 }
 
-
 #[test]
 fn test_cell_mod() {
     compare_output_ext(",+. >-.", vec![1], &[2, 255]);
@@ -58,7 +71,11 @@ fn test_cell_mod() {
 
 #[test]
 fn test_manual_division() {
-    compare_output_ext(",>,>,<<[->+>-[>+>>]>[+[-<+>]>+>>]<<<<<<] >>>>.", vec![20, 0, 2], &[10]);
+    compare_output_ext(
+        ",>,>,<<[->+>-[>+>>]>[+[-<+>]>+>>]<<<<<<] >>>>.",
+        vec![20, 0, 2],
+        &[10],
+    );
 }
 
 #[test]
@@ -95,7 +112,5 @@ fn test_auxi_bitwise_unary() {
 #[test]
 fn test_auxi_bitwise_binary() {
     // read, load register, read, operate, write to tape, write out
-    compare_output_ext(",(,&).",
-                       vec![2, 128],
-                       &[0]);
+    compare_output_ext(",(,&).", vec![2, 128], &[0]);
 }

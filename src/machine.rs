@@ -1,8 +1,8 @@
 //! The implementation of the SBrain VM.
-use std::io::{Read, Write};
-use std::io;
-use std::u16::MAX as u16MAX;
 use crate::{MAddr, MData};
+use std::io;
+use std::io::{Read, Write};
+use std::u16::MAX as u16MAX;
 
 /// A virtual machine modelling the SBrain Turing machine.
 /// This machine implements the specification relatively strictly, providing exactly 2^16 (65536)
@@ -38,7 +38,11 @@ impl<'a> SBrainVM<'a> {
     /// Return a new SBrainVM, with no data in any tapes.
     /// If given a `None` `input`, all reads read 0.
     /// If given a `None` `output`, all writes are discarded.
-    pub fn new(input: Option<&'a mut dyn Read>, output: Option<&'a mut dyn Write>, program: &[u8]) -> SBrainVM<'a> {
+    pub fn new(
+        input: Option<&'a mut dyn Read>,
+        output: Option<&'a mut dyn Write>,
+        program: &[u8],
+    ) -> SBrainVM<'a> {
         let mut new = SBrainVM {
             data_tape: [0; 65536],
             data_stack: vec![0; 256],
@@ -85,9 +89,7 @@ impl<'a> SBrainVM<'a> {
                 w.write(&[output])?;
                 Ok(())
             }
-            &mut None => {
-                Ok(())
-            }
+            &mut None => Ok(()),
         }
     }
 
@@ -107,12 +109,12 @@ impl<'a> SBrainVM<'a> {
             }
             // Decr. and incr. for *data_p
             2 => {
-                self.data_tape[self.data_p as usize] = self.data_tape[self.data_p as usize]
-                    .wrapping_sub(1);
+                self.data_tape[self.data_p as usize] =
+                    self.data_tape[self.data_p as usize].wrapping_sub(1);
             }
             3 => {
-                self.data_tape[self.data_p as usize] = self.data_tape[self.data_p as usize]
-                    .wrapping_add(1);
+                self.data_tape[self.data_p as usize] =
+                    self.data_tape[self.data_p as usize].wrapping_add(1);
             }
             // Jump instructions
             4 => {
@@ -121,7 +123,9 @@ impl<'a> SBrainVM<'a> {
                     let mut nest_level = 1;
                     while nest_level > 0 {
                         self.inst_p = self.inst_p.wrapping_add(1);
-                        if self.inst_p == 0 { return Ok(false); }
+                        if self.inst_p == 0 {
+                            return Ok(false);
+                        }
                         if self.exec_tape[self.inst_p as usize] == 4 {
                             nest_level += 1;
                         } else if self.exec_tape[self.inst_p as usize] == 5 {
@@ -136,7 +140,9 @@ impl<'a> SBrainVM<'a> {
                     let mut nest_level = 1;
                     while nest_level > 0 {
                         self.inst_p = self.inst_p.wrapping_sub(1);
-                        if self.inst_p == u16MAX { return Ok(true); }
+                        if self.inst_p == u16MAX {
+                            return Ok(true);
+                        }
                         if self.exec_tape[self.inst_p as usize] == 5 {
                             nest_level += 1;
                         } else if self.exec_tape[self.inst_p as usize] == 4 {
@@ -191,9 +197,9 @@ impl<'a> SBrainVM<'a> {
 
     fn nexti(&mut self) -> bool {
         // increment the PC
-        self.inst_p  = self.inst_p.wrapping_add(1);
+        self.inst_p = self.inst_p.wrapping_add(1);
         // if it went over, wrap it and inform the caller
-        if self.inst_p as usize == self.exec_tape.len() - 1{
+        if self.inst_p as usize == self.exec_tape.len() - 1 {
             self.inst_p = 0;
             return true;
         }
@@ -215,7 +221,7 @@ impl<'a> SBrainVM<'a> {
                 self.nexti();
             }
 
-           // Increment the cycle count
+            // Increment the cycle count
             done_cycles += 1;
             if let Some(n) = cycles {
                 if done_cycles >= n {

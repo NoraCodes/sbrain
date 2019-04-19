@@ -4,7 +4,7 @@ use std::io::Cursor;
 
 /// Convert a tape of MData cells into Unicode chars. Invalid chars are excluded, which could have
 /// some unintended side effects for genesis based on string comparisons.
-pub fn tape_to_string<'a>(tape: &'a [MData]) -> Cow<'a, str>{
+pub fn tape_to_string<'a>(tape: &'a [MData]) -> Cow<'a, str> {
     String::from_utf8_lossy(&tape)
 }
 
