@@ -31,8 +31,8 @@
 //!        1|      >| Increment `data_p`
 //!        2|      -| Subtract one from the cell pointed at by `data_p`
 //!        3|      +| Add one to the cell pointed at by `data_p`
-//!        4|      [| If the cell pointed at by `data_p` is zero, move `inst_p` to point to the matching `]`, plus one.
-//!        5|      ]| If the cell pointed at by `data_p` is nonzero, move `inst_p` to point to the matching `]`, plus one.
+//!        4|      [| If the cell pointed at by `data_p` is zero, move `inst_p` to point to the matching `]`, plus one, or NOP if there is none.
+//!        5|      ]| If the cell pointed at by `data_p` is nonzero, move `inst_p` to point to the matching `]`, plus one, or NOP if there is none.
 //!        6|      .| Place the value in the cell pointed at by `data_p` on the output tape
 //!        7|      ,| Place the next value from the input tape in the cell pointed at by `data_p`
 //!        8|      {| Push the value from the cell pointed at by `data_p` onto the stack
