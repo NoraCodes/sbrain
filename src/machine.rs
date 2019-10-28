@@ -119,12 +119,14 @@ impl<'a> SBrainVM<'a> {
             // Jump instructions
             4 => {
                 // If *data_p is 0, skip forward to the corresponding 5
+                let this_inst = self.inst_p;
                 if self.data_tape[self.data_p as usize] == 0 {
                     let mut nest_level = 1;
                     while nest_level > 0 {
                         self.inst_p = self.inst_p.wrapping_add(1);
                         if self.inst_p == 0 {
-                            return Ok(false);
+                            self.inst_p = this_inst;
+                            break;
                         }
                         if self.exec_tape[self.inst_p as usize] == 4 {
                             nest_level += 1;
@@ -136,12 +138,14 @@ impl<'a> SBrainVM<'a> {
             }
             5 => {
                 // If *data_p isn't 0, skip backward to the corresponding 4
+                let this_inst = self.inst_p;
                 if self.data_tape[self.data_p as usize] != 0 {
                     let mut nest_level = 1;
                     while nest_level > 0 {
                         self.inst_p = self.inst_p.wrapping_sub(1);
                         if self.inst_p == u16MAX {
-                            return Ok(true);
+                            self.inst_p = this_inst;
+                            break;
                         }
                         if self.exec_tape[self.inst_p as usize] == 5 {
                             nest_level += 1;
