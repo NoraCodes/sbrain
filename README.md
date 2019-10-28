@@ -1,7 +1,10 @@
 # libsbrain
+[![crates.io](https://img.shields.io/crates/d/sbrain)](https://crates.io/crates/sbrain)
+[![docs on docs.rs](https://docs.rs/sbrain/badge.svg)](https://docs.rs/sbrain)
+
 A library for execution of Semantic Brain, based on Urban Müller's famous but unprintable language.
 
-If you're looking for a compiler/interpreter standalone, it's called [sbic](https://github.com/silverwingedseraph/sbic).
+If you're looking for a compiler/interpreter standalone, it's called [sbic](https://github.com/NoraCodes/sbic).
 
  ## What is SBrain?
    SBrain, or Semantic Brain, is a language based on Urban Müller's famous language with only 8 symbols (3 bit instructions).

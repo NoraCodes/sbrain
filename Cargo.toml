@@ -1,6 +1,6 @@
 [package]
 name = "sbrain"
-version = "0.5.0"
+version = "0.99.0"
 authors = ["Leonora Tindall <nora@nora.codes>"]
 
 description = "A library for evaluating Semantic Brain, a minimalistic multiparadigm programming language optimized for genetic programming applications."
