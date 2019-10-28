@@ -62,8 +62,8 @@ fn test_cat() {
 
 #[test]
 fn test_badloop() {
-    compare_output("[", b"");
-    compare_output("][", b"");
+    compare_output("+[.", &[1]);
+    compare_output("+].[.", &[1, 1]);
 }
 
 #[test]
